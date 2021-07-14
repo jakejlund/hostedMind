@@ -1,0 +1,401 @@
+<html xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/footer_style.css">
+    <title>Department for Education SA | Towards 2028 | AR Experience</title>
+
+    <script src="js/mindar.prod.js"></script>
+    <script src="js/lumi-mind.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!--script async src="https://www.googletagmanager.com/gtag/js?id=G-K1WJVWRCPT"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'G-K1WJVWRCPT');
+	</script-->
+
+</head>
+
+<body>
+
+    <script>
+        console.log("What mode? " + window.treasureMapMode);
+        var targetPath = './targets_cube.mind';
+        if (window.treasureMapMode) {
+            targetPath = './targets_map.mind';
+        }
+
+        /* insert correct marker file on load */
+        /* if this fails, default is to load the MAP version since that will also work OK on cube */
+        window.onload = function () {
+            document.getElementById('main_scene')
+                .setAttribute('mindar', 'imageTargetSrc: ' + targetPath + '; showStats: true; uiLoading: #loading_overlay');
+        };
+
+    </script>
+
+    <a-scene id="main_scene" mindar="imageTargetSrc: ./targets_map.mind; showStats: true;" color-space="sRGB"
+        renderer="logarithmicDepthBuffer: true;" vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false" gltf-model="./">
+        <a-assets>
+            <!-- shared models -->
+            <a-asset-item id="earthModel" src="./models/Global/DFEEarthWithAnimation.gltf"></a-asset-item>
+            <a-asset-item id="grassModel" src="./models/Global/GrassCompressed.gltf"></a-asset-item>
+
+            <!-- side 1 -->
+            <a-asset-item id="phoneModel" src="./models-backup/side1/Phone.gltf"></a-asset-item>
+            <a-asset-item id="trophyModel" src="./models/Side_1/TrophyIconCompressed.gltf"></a-asset-item>
+            <a-asset-item id="speechBubble" src="./models-backup/side1/SpeechBubble.glb"></a-asset-item>
+
+            <!-- side 2 and 3 -->
+            <a-asset-item id="projectorModel" src="./models-backup/projector.glb"></a-asset-item>
+            <a-asset-item id="tvModel" src="./models-backup/SimpleTV.obj"></a-asset-item>
+            <a-asset-item id="playButton" src="./models/Side_2&3/DFEColor/Play.gltf"></a-asset-item>
+            <a-asset-item id="pauseButton" src="./models/Side_2&3/DFEColor/Pause.gltf"></a-asset-item>
+            <a-asset-item id="fullScreen" src="./models/Side_2&3/DFEColor/FullScreen.gltf"></a-asset-item>
+            <video id="video_2" autoplay="false" mute="true" loop="true" src="./videos/2021ActionPlan.mp4" playsinline
+                   webkit-playsinline controls></video>
+            <video id="video_3" autoplay="false" mute="true" loop="true" src="./videos/sintel.mp4" playsinline
+                   webkit-playsinline controls></video>
+
+            <!-- side 4 -->
+            <a-asset-item id="schoolModel" src="./models/Side_4/SchoolCompressed.gltf"></a-asset-item>
+            <a-asset-item id="bookModel" src="./models/Side_4/BookExportedAnimationCompressed.gltf"></a-asset-item>
+            <!--side 5 most models need to be dynamically loaded-->
+            <a-asset-item id="arrow_Button" src="./models/Global/Arrow.gltf"></a-asset-item>
+
+            <!-- side 6 -->
+<!--            <a-asset-item id="stratPlanArrow" src="./models/side6/BookAnimationSide6Arrow.gltf"></a-asset-item>-->
+            <a-asset-item id="stratPlanBook" src="./models/Side_6/BookPanfletIcon.gltf"></a-asset-item>
+
+            <!-- titles waiting on callum certification-->
+            <a-asset-item id="side_title1" src="./models-backup/titles/SIDE1-title.glb"></a-asset-item>
+            <a-asset-item id="side_title2" src="./models-backup/titles/SIDE2-title.glb"></a-asset-item>
+            <a-asset-item id="side_title3" src="./models-backup/titles/SIDE3-title.glb"></a-asset-item>
+            <a-asset-item id="side_title4" src="./models-backup/titles/SIDE4-title.glb"></a-asset-item>
+            <a-asset-item id="side_title5" src="./models-backup/titles/SIDE5-title.glb"></a-asset-item>
+            <a-asset-item id="side_title6" src="./models-backup/titles/SIDE6-title.glb"></a-asset-item>
+
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"
+            raycaster="far: 10000; objects: .clickable"></a-camera>
+
+        <!--    lights underside-->
+        <a-light type="directional" position="5 -5 1" rotation="90 0 0" target="#directionaltarget" color="#C9C9C9"
+            intensity="0.8">
+            <a-entity id="directionaltarget" position="1.14 -19.2 -10.21"></a-entity>
+        </a-light>
+
+
+        <!--    lights top-->
+        <a-light type="directional" position="5 -5 1" rotation="90 0 0" target="#directionaltarget0" color="#dfe6fb"
+            intensity="0.9">
+            <a-entity id="directionaltarget0" position="0.42 -0.48 -0.26"></a-entity>
+            <!-- <a-entity id="directionaltarget0" position="0 -0.040 0.02"></a-entity> -->
+        </a-light>
+
+        <!--    ambient to reduce shadowing-->
+        <a-entity light="type: ambient; color: #f7dbbb; intensity: 1"></a-entity>
+
+
+        <!--    the id is the actual marker number-->
+        <a-entity id="target-1" mindar-image-target="targetIndex: 0" show-scanning-ui-on-lost animate-side1>
+            <!-- load-earth -->
+            <a-entity id="target-1-parent" position="0 0 0" position-for-cube>
+
+                <a-gltf-model id="speech-bubble" rotation="0 -180 0" position="0.111 0.131 0.62"
+                    scale="0.007 0.004 0.006" src="#speechBubble" set-speech-opacity>
+
+                    <a-entity id="bubble1" visible="false">
+                        <a-entity text-geometry="value: Our plan reflects the work" material="color: black"
+                            position="22 0 -8" rotation="90 180 0" scale="10 12 10"></a-entity>
+
+                        <a-entity text-geometry="value: we've done so far and the" material="color: black"
+                            position="22 0 3" rotation="90 180 0" scale="10 12 10"></a-entity>
+
+                        <a-entity text-geometry="value: steps we're taking..." material="color: black"
+                            position="10 0 14" rotation="90 180 0" scale="10 12 10"></a-entity>
+                    </a-entity>
+
+
+                    <a-entity id="bubble2" visible="false">
+                        <a-entity text-geometry="value: to build a world-class" material="color: black"
+                            position="14 0 -8" rotation="90 180 0" scale="10 12 10"></a-entity>
+
+                        <a-entity text-geometry="value: public education system" material="color: black"
+                            position="18 0 3" rotation="90 180 0" scale="10 12 10"></a-entity>
+
+                        <a-entity text-geometry="value: in South Australia." material="color: black" position="8 0 14"
+                            rotation="90 180 0" scale="10 12 10"></a-entity>
+                    </a-entity>
+
+
+                    <a-entity id="bubble3" visible="false">
+                        <a-entity text-geometry="value: This plan is for" material="color: black" position="8.6 0 -5"
+                            rotation="90 180 0" scale="12 14 12"></a-entity>
+
+                        <a-entity text-geometry="value: everyone" material="color: black" position="13.5 0 10.7"
+                            rotation="90 180 0" scale="22 24 22"></a-entity>
+                    </a-entity>
+
+
+                    <a-entity id="bubble4" visible="false">
+                        <a-entity text-geometry="value: To reach our goal we need" material="color: black"
+                            position="22 0 -8" rotation="90 180 0" scale="9.5 11.5 9.5"></a-entity>
+
+                        <a-entity text-geometry="value: a coalition committed to" material="color: black"
+                            position="18 0 3" rotation="90 180 0" scale="9.5 11.5 9.5"></a-entity>
+
+                        <a-entity text-geometry="value: our world-class ambition..." material="color: black"
+                            position="20 0 14" rotation="90 180 0" scale="9.5 11.5 9.5"></a-entity>
+                    </a-entity>
+
+
+                    <a-entity id="bubble5" visible="false">
+                        <a-entity text-geometry="value: leaders, educators, staff," material="color: black"
+                            position="15 0 -8" rotation="90 180 0" scale="8.8 11.5 9.5"></a-entity>
+
+                        <a-entity text-geometry="value: parents and carers, communities," material="color: black"
+                            position="27 0 3" rotation="90 180 0" scale="8.8 11.5 9.5"></a-entity>
+
+                        <a-entity text-geometry="value: employers and industry." material="color: black"
+                            position="13 0 14" rotation="90 180 0" scale="8.8 11.5 9.5"></a-entity>
+                    </a-entity>
+
+
+                    <a-entity id="bubble6" visible="false">
+                        <a-entity text-geometry="value: Together, we can achieve" material="color: black"
+                            position="18 0 -10" rotation="90 180 0" scale="9 11 9"></a-entity>
+
+                        <a-entity text-geometry="value: world class" material="color: black" position="16 0 6"
+                            rotation="90 180 0" scale="20 22 20"></a-entity>
+
+                        <a-entity text-geometry="value: education by 2028" material="color: black" position="8 0 17"
+                            rotation="90 180 0" scale="9 11 9"></a-entity>
+                    </a-entity>
+
+
+                </a-gltf-model>
+
+
+                <a-gltf-model id="phone" rotation="150 87.13 90.3" position="-0.23 0.067 0.35" scale="0.18 0.18 0.18"
+                    src="#phoneModel"></a-gltf-model>
+
+                <a-gltf-model id="trophy" rotation="66.71 -84.8 -84.45 " position="0.22 0.1 0.019"
+                    scale="0.004 0.004 0.004" src="#trophyModel" set-trophy-textures></a-gltf-model>
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+
+                <a-gltf-model rotation="90 0 0" position="0 -0.28 0" scale="0.0045 0.0045 0.0045" src="#side_title1">
+                </a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+
+
+        <a-entity id="target-2" mindar-image-target="targetIndex: 1" load-earth show-scanning-ui-on-lost load-video-side>
+            <a-entity id="parent" position="0 0 0" position-for-cube>
+                <!--        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>-->
+                <a-video id="video_scene" loop="true" webkit-playsinline playsinline src="#video_2" width="2"
+                         height="1.5" position="0 -0.1 2.128" rotation="90 0 0" visible="false"></a-video>
+
+                <a-gltf-model id="earth" rotation="90 0 0" position="0 0 0" scale="0.015 0.015 0.015" src="#earthModel"
+                              set-earth-textures></a-gltf-model>
+                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"
+                              animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"
+                              src="#grassModel" visible="false"></a-gltf-model>
+<!--                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"-->
+<!--                              animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"-->
+<!--                              src="#grassModel" visible="false"></a-gltf-model>-->
+
+
+                <a-gltf-model id="projector_scene" rotation="90 0 0 " position="0 0 0.62" scale="0.005 0.005 0.005"
+                              src="#projectorModel" visible="false"></a-gltf-model>
+
+                <a-cone id="cone_scene" material=" color: darkturquoise; opacity: 0.5 transparent: true" height="0.6"
+                        radius-bottom="0" radius-top="0.2" rotation="90 0 0 " position="0 0 0.95" visible="false">
+                </a-cone>
+
+                <a-obj-model id="tv_scene" material=" color: black; reflectivity:0;" rotation="90 0 0"
+                             position="0 -0.1 2" scale="0.00269 0.0036 0.004" src="#tvModel" visible="false"></a-obj-model>
+
+                <a-gltf-model id="play_scene" rotation="90 0 0 " position="1.4 0 2.55" scale="0.175 0.175 0.175"
+                              src="#playButton" visible="false" ></a-gltf-model>
+
+                <a-gltf-model id="pause_scene" rotation="90 0 0 " position="1.4 0 2.55" scale="0.175 0.175 0.175"
+                              src="#pauseButton" visible="false" ></a-gltf-model>
+                <a-gltf-model id="fullscreen_scene" rotation="90 0 0 " position="1.4 0 1.75" scale="0.175 0.175 0.175"
+                              src="#fullScreen" visible="false" class="clickable"></a-gltf-model>
+                <!--        <a-gltf-model rotation="0 0 0 " position="1 0 0" scale="10 10 10" src="#schoolModel" animation-mixer></a-gltf-model>-->
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+                <a-gltf-model rotation="90 0 0" position="0 -0.32 0" scale="0.006 0.006 0.006" src="#side_title2">
+                </a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+
+
+        <a-entity id="target-3" mindar-image-target="targetIndex: 2" load-earth show-scanning-ui-on-lost load-video-side>
+            <a-entity id="parent" position="0 0 0"  position-for-cube>
+
+                <a-video id="video_scene" loop="true" webkit-playsinline playsinline src="#video_3" width="2"
+                         height="1.5" position="0 -0.1 2.128" rotation="90 0 0" visible="false"></a-video>
+
+                <a-gltf-model id="earth" rotation="90 0 0" position="0 0 0" scale="0.015 0.015 0.015" src="#earthModel"
+                              set-earth-textures></a-gltf-model>
+
+                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"
+                              animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"
+                              src="#grassModel" visible="false"></a-gltf-model>
+
+
+                <a-gltf-model id="projector_scene" rotation="90 0 0 " position="0 0 0.62" scale="0.005 0.005 0.005"
+                              src="#projectorModel" visible="false"></a-gltf-model>
+
+                <a-cone id="cone_scene" material=" color: darkturquoise; opacity: 0.5 transparent: true" height="0.6"
+                        radius-bottom="0" radius-top="0.2" rotation="90 0 0 " position="0 0 0.95" visible="false">
+                </a-cone>
+
+                <a-obj-model id="tv_scene" material=" color: black; reflectivity:0;" rotation="90 0 0"
+                             position="0 -0.1 2" scale="0.00269 0.0036 0.004" src="#tvModel" visible="false"></a-obj-model>
+
+                <a-gltf-model id="play_scene" rotation="90 0 0 " position="1.4 0 2.55" scale="0.175 0.175 0.175"
+                              src="#playButton" visible="false" material ="roughness:1;" ></a-gltf-model>
+
+                <a-gltf-model id="pause_scene" rotation="90 0 0 " position="1.4 0 2.55" scale="0.175 0.175 0.175"
+                              src="#pauseButton" visible="false" material ="roughness:1;"></a-gltf-model>
+                <a-gltf-model id="fullscreen_scene" rotation="90 0 0 " position="1.4 0 1.75" scale="0.175 0.175 0.175"
+                              src="#fullScreen" visible="false" ></a-gltf-model>
+                <!--        <a-gltf-model rotation="0 0 0 " position="1 0 0" scale="10 10 10" src="#schoolModel" animation-mixer></a-gltf-model>-->
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+                <a-gltf-model rotation="90 0 0" position="0 -0.28 0" scale="0.0045 0.0045 0.0045" src="#side_title3">
+                </a-gltf-model>
+                </a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+
+
+        <a-entity id="target-4" mindar-image-target="targetIndex: 3" load-earth show-scanning-ui-on-lost>
+            <a-entity id="target-4-parent" position="0 0 0" position-for-cube>
+                <a-gltf-model id="earth" rotation="90 0 0" position="0 0 0" scale="0.015 0.015 0.015" src="#earthModel"
+                    set-earth-textures></a-gltf-model>
+
+                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"
+                    animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"
+                    src="#grassModel" visible="false"></a-gltf-model>
+
+
+                <a-gltf-model id="target-0-1" class="clickable" rotation="90 0 0 " position="0.12 -0.25 1"
+                    scale="0.05 0.05 0.05" src="#schoolModel" animation-mixer></a-gltf-model>
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+                <a-gltf-model rotation="90 0 0" position="0 -0.28 0" scale="0.0045 0.0045 0.0045" src="#side_title4">
+                </a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+
+
+        <a-entity id="target-5" mindar-image-target="targetIndex: 4" load-earth show-scanning-ui-on-lost load-side-5>
+            <a-entity id="target-5-parent" position="0 0 0" position-for-cube>
+
+                <a-gltf-model id="earth" rotation="90 0 0" position="0 0 0" scale="0.015 0.015 0.015" src="#earthModel"
+                    set-earth-textures></a-gltf-model>
+
+                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"
+                    animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"
+                    src="#grassModel" visible="false"></a-gltf-model>
+
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+                <a-gltf-model rotation="90 0 0" position="0 -0.28 0" scale="0.0045 0.0045 0.0045" src="#side_title5">
+                </a-gltf-model>
+                <a-gltf-model id="model" rotation="90 0 0" position="0 0 0.75" scale="0.02 0.02 0.02" src="./models/Side_5/YearT7oHighSchoolCompression.gltf" visible="false" class="clickable"  ></a-gltf-model>
+                <a-gltf-model id="arrow_right" rotation="90 0 0" position="0.75 0 1" scale="0.175 0.175 0.175" src="#arrow_Button" class="clickable" visible="false"></a-gltf-model>
+                <a-gltf-model id="arrow_left" rotation="90 180 0" position="-0.75 0 1" scale="0.175 0.175 0.175" src="#arrow_Button" class="clickable" visible="false"></a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+
+
+        <a-entity id="target-6" mindar-image-target="targetIndex: 5" load-earth show-scanning-ui-on-lost>
+            <a-entity id="target-6-parent" position="0 0 0" position-for-cube>
+                <a-gltf-model id="earth" rotation="90 0 0" position="0 0 0" scale="0.015 0.015 0.015" src="#earthModel"
+                    set-earth-textures></a-gltf-model>
+
+                <a-gltf-model id="grass" rotation="90 0 0 " position="0 0 0.635" scale="0 0 0"
+                    animation="property: scale; to: 0.0394 0.0394 0.0394; loop: false; startEvents: zoomIn; dur: 500"
+                    src="#grassModel" visible="false"></a-gltf-model>
+
+                <a-gltf-model id="book6" class="clickable" rotation="90 0 0" position="-0.04 0.20 0.85" scale="0.7 0.7 0.7"
+                              src="#stratPlanBook" visible="false" animation-mixer load-icons-6>
+                </a-gltf-model>
+
+                <a-plane color="#7BC8A4" material="opacity: 0.7" height="1" width="1"></a-plane>
+                <a-gltf-model rotation="90 0 0" position="0 -0.28 0" scale="0.0045 0.0045 0.0045" src="#side_title6">
+                </a-gltf-model>
+            </a-entity>
+        </a-entity>
+
+    </a-scene>
+
+    <div id="loading_overlay">
+        <span class="loading_indicator">
+            <svg class="svg_format" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100"
+                enable-background="new 0 0 100 100" xml:space="preserve">
+                <circle fill="#FFFFFF" stroke="#339999" stroke-width="2" cx="50" cy="50" r="45" />
+                <image width="100" height="100" xlink:href="assets/loading-text.svg"></image>
+                <image width="100" height="100" xlink:href="assets/teardrop.svg">
+                    <animateTransform attributeName="transform" dur="2s" type="rotate" from="0 50 50" to="360 50 50"
+                        repeatCount="indefinite" />
+                </image>
+            </svg>
+        </span>
+    </div>
+
+    <div class="footer_container">
+
+        <div class="title_parent">
+            <img src="assets/footer_title.svg">
+        </div>
+
+        <div class="buttons">
+            <span class="button"><a href=""><img src="assets/icon_camera.svg" style="display: none"></a></span>
+            <span class="button"><a href="./index.html"><img src="assets/icon_swap_mode.svg"
+                        style="display: none"></a></span>
+            <span class="button"><a href=""><img src="assets/icon_help.svg" style="display: none"></a></span>
+        </div>
+
+        <div class="logo_parent">
+            <a href="http://lumination.com.au/" target="_blank"><img src="assets/lumilogo.png"></a>
+            <a href="https://www.education.sa.gov.au/" target="_blank"><img src="assets/edulogo.png"></a>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        var hasInteracted = false;
+        //temporaily here to make video play
+        window.addEventListener('click', function () {
+            if (!hasInteracted) {
+                let parent2 = document.querySelector('#target-2');
+                var video = parent2.querySelector('#video_scene');
+                video.play();
+                video.pause();
+                hasInteracted = true;
+            }
+        }, false);
+    </script>
+</body>
+
+</html>
