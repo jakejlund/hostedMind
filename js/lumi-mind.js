@@ -9,7 +9,7 @@ if (!experienceType || experienceType == null || (experienceType.trim() != "map"
 }
 
 window.treasureMapMode = (experienceType == "map");
-console.log("We're using this with a ", experienceType, window.treasureMapMode);
+console.log("[v001] We're using this with a ", experienceType, window.treasureMapMode);
 
 
 var park_env_texture = new THREE.CubeTextureLoader().load([
@@ -23,10 +23,95 @@ var park_env_texture = new THREE.CubeTextureLoader().load([
 park_env_texture.format = THREE.RGBFormat;
 
 
+window.addEventListener('arReady', function () {
+    getCameraAndCanvas();
+    //switch placeholder footer for one with usable buttons
+    document.getElementById('title_image_placeholder').style.display = "none";
+    document.getElementById('title_image').style.display = "";
+    document.getElementById('lumilogo').src = "assets/lumination_logo_only.svg";
+    document.getElementById('edulogo').src="assets/education_logo_only.svg";
 
-window.addEventListener('resize', function () {
-    // console.log("RESIZED!");
+});
+
+
+function disableCameraFlipButton() {
+    document.getElementById('camera_black').setAttribute('style', 'fill:#00000020;stroke-width:0.0408328"');
+    document.getElementById('camera_link').removeAttribute('xlink:href');
+    document.getElementById('camera_link').setAttribute('class', '');
+}
+
+var successfulStream = null;
+var swappingCameras = false; //flag to stop this happening more than once at a time
+function capture() {
+    if(swappingCameras){
+        return;
+    }
+    swappingCameras = true;
+    const videoConstraints = {
+        audio: false,
+        video: { facingMode: shouldFaceUser ? 'user' : 'environment' }
+    };
+
+    // defaultsOpts.video = { facingMode: shouldFaceUser ? 'user' : 'environment' }
+    navigator.mediaDevices.getUserMedia(videoConstraints)
+        .then(function (_stream) {
+            // console.log("Stream?! ", _stream);
+            if(_stream){
+                stream = _stream;
+                if (window.video) {
+                    window.video.srcObject = stream;
+                    successfulStream = stream;
+                    window.video.play();
+                    swappingCameras = false;
+                }
+            }
+        })
+        .catch(function (err) {
+            window.video.srcObject = successfulStream;
+            console.log("Error in getUserMedia", err);
+        });
+}
+
+var popup_visible = false;
+let shouldFaceUser = false; //default is enviroment camera
+let stream = null;
+
+function toggleHelp() {
+    if (popup_visible) {
+        //hide help, show scanning
+        document.getElementById('help_popup').setAttribute('style', 'display: none;');
+        var scanningUI = document.getElementsByClassName("mindar-ui-scanning");
+        if (scanningUI) {
+            scanningUI[0].classList.remove("hidden");
+        }
+    } else {
+        //show help, hide scanning
+        document.getElementById('help_popup').setAttribute('style', '');
+        var scanningUI = document.getElementsByClassName("mindar-ui-scanning");
+        if (scanningUI && scanningUI.length > 0) {
+            scanningUI[0].classList.add("hidden");
+        }
+    }
+    popup_visible = !popup_visible;
+}
+
+window.addEventListener('load', function () {
+    document.getElementById('help_link').addEventListener('click', function () {
+        toggleHelp();
+    });
+
+    document.getElementById('exit_help').addEventListener('click', function () {
+        toggleHelp();
+    });
+
+    getCameraAndCanvas();
+});
+
+var availableCameras = 0;
+function getCameraAndCanvas() {
+    
     if (!window.video || !window.canvas) {
+        availableCameras = 0; //reset counter
         let videos = document.getElementsByTagName('video');
         let canvases = document.getElementsByClassName('a-canvas');
         if (videos && videos.length > 0 && canvases && canvases.length > 0) {
@@ -34,6 +119,44 @@ window.addEventListener('resize', function () {
             for (var i = 0; i < videos.length; i++) {
                 if (!videos[i].id) {
                     window.video = videos[i];
+
+                    const constraints = {
+                        audio: false,
+                        video: true
+                    };
+
+                    navigator.mediaDevices.enumerateDevices().then(function (devices) {
+                        for (var i = 0; i < devices.length; i++) {
+                            var device = devices[i];
+                            if (device.kind === 'videoinput') {
+                                availableCameras++;
+                            }
+                        };
+                        if (availableCameras < 2) {
+                            disableCameraFlipButton();
+                            return false;
+
+                        } else {
+
+                            let supports = navigator.mediaDevices.getSupportedConstraints();
+                            if (supports['facingMode'] != true) {
+                                disableCameraFlipButton();
+                                return false;
+                            }
+
+                            document.getElementById('camera_link').addEventListener('click', function () {
+                                if (stream == null || swappingCameras) return
+                                // we need to flip, stop everything
+                                stream.getTracks().forEach(t => { t.stop(); });
+                                // toggle / flip
+                                shouldFaceUser = !shouldFaceUser;
+                                capture();
+                            })
+
+                            capture();
+                        }
+                    });
+
                     break;
                 }
             }
@@ -41,8 +164,19 @@ window.addEventListener('resize', function () {
         }
         if (!window.video || !window.canvas) {
             console.log("ERROR: Couldn't get video and canvas. May still be loading.");
-            return;
+            return false;
         }
+
+        // alert("DID THE CAMERA THING!");
+        return true;
+    }
+}
+
+window.addEventListener('resize', function () {
+    // console.log("RESIZED!");
+    var gotCam = getCameraAndCanvas();
+    if (!gotCam) {
+        return;
     }
 
     // adjust the canvas to be scaled the same as 
@@ -157,7 +291,7 @@ AFRAME.registerComponent("set-metalness-roughness", {
             let mesh = this.el.getObject3D("mesh");
             mesh.traverse(node => {
                 if (!node.material) return;
-                console.log(node.material.name);
+                // console.log(node.material.name);
                 node.material.metalness = 1;
                 node.material.roughness = 0;
                 node.material.envMap = park_env_texture;
@@ -179,7 +313,7 @@ AFRAME.registerComponent('load-video-side', {
 
         // earth animation finished
         earth.addEventListener("animation-finished", event => {
-            console.log("earth animation finished");
+            // console.log("earth animation finished");
 
             const projector = el.querySelector('#projector_scene');
             projector.setAttribute("visible", "true");
@@ -205,7 +339,6 @@ AFRAME.registerComponent('load-video-side', {
             full.setAttribute("visible", "true");
 
             const play = parent.querySelector('#play_scene');
-
             // play.setAttribute("visible","true");
 
             const pause = parent.querySelector('#pause_scene');
@@ -236,7 +369,7 @@ AFRAME.registerComponent('load-video-side', {
 
         // marker is lost
         el.addEventListener("targetLost", even => {
-            console.log("target lost");
+            // console.log("target lost");
             const video2 = document.querySelector('#video_2');
             const video3 = document.querySelector('#video_3');
             const play = parent.querySelector('#play_scene');
@@ -277,19 +410,19 @@ AFRAME.registerComponent('load-earth', {
         // marker is found
         markerTarget.addEventListener("targetFound", event => {
             // play earth animation
-            console.log("[shared] attempting to play earth anim");
+            // console.log("[shared] attempting to play earth anim");
             earth.setAttribute('animation-mixer', { clip: "EarthAnim", loop: "once", clampWhenFinished: "true" });
         });
 
         markerTarget.addEventListener("animation-finished", event => {
-            console.log("[shared] earth animation finished");
+            // console.log("[shared] earth animation finished");
             grass.emit('zoomIn'); //make grass appear              
             grass.setAttribute("visible", "true");
         });
 
         // marker is lost
         markerTarget.addEventListener("targetLost", event => {
-            console.log("[shared] target lost");
+            // console.log("[shared] target lost");
             earth.removeAttribute('animation-mixer');
             grass.setAttribute("scale", "0 0 0");
             grass.setAttribute("visible", "false");
@@ -307,11 +440,6 @@ AFRAME.registerComponent('load-side-5', {
         let earth = el.querySelector("#earth");
         let parent = el.querySelector("#target-5-parent");
         var model = parent.querySelector("#model")
-
-        var arrowLeft = parent.querySelector("#arrow_left")
-        var arrowRight = parent.querySelector("#arrow_right")
-        arrowLeft.setAttribute("visible","true");
-        arrowRight.setAttribute("visible","false");
 
         // console.log("Setting up anim", markerTarget, earthModel, el);
         // earth animation finished
@@ -346,9 +474,9 @@ AFRAME.registerComponent('load-icons-6', {
 
         // earth animation finished
         earth.addEventListener("animation-finished", event => {
-            console.log("earth animation finished");
+            // console.log("earth animation finished");
             // play loading animations and make models visible 
-            console.log("attempting to play load anims");
+            // console.log("attempting to play load anims");
             el.setAttribute("animation-mixer", { clip: "Start", loop: "once", clampWhenFinished: "true" });
 
             //avoids small flicker at start of animation
@@ -358,7 +486,7 @@ AFRAME.registerComponent('load-icons-6', {
 
         // play idle anims once load anims are finished
         el.addEventListener("animation-finished", event => {
-            console.log("attempting to play idle anims");
+            // console.log("attempting to play idle anims");
             el.setAttribute("animation-mixer", { clip: "Idle", loop: "repeat" });
         });
 
@@ -395,19 +523,20 @@ AFRAME.registerComponent('animate-side1', {
         for(var i = 1; i <= 6; i++){
             bubbleNodes.push(markerTarget.querySelector('#bubble' + i));
         }
-        console.log(bubbleNodes);
+        // console.log(bubbleNodes);
 
 
         // marker is found
         markerTarget.addEventListener("targetFound", event => {
             bubbleCounter = -1;
             phoneCounter = -1;
-
+            runDriftAdjuster = true;
             f();
         });
 
         markerTarget.addEventListener("targetLost", event => {
             bubbleCounter = -2;
+            runDriftAdjuster = false;
         });
     }
 });
@@ -433,9 +562,11 @@ function displayNextBubble(){
 
 var start;
 var nextAt;
-
+var runDriftAdjuster = false;
 var interval = 6000;
 var f = function() {
+    if(!runDriftAdjuster) return;
+
     if (!start) {
         start = new Date().getTime();
         nextAt = start;
