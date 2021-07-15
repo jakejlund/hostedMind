@@ -1,12 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/html">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<title>Department for Education SA | Towards 2028 | AR Experience</title>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<!--script async src="https://www.googletagmanager.com/gtag/js?id=G-K1WJVWRCPT"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
+<!--    <link rel="stylesheet" href="css/new_style.css">-->
+    <title>Department for Education SA | Towards 2028 | AR Experience</title>
+
+    <script src="./mindar.prod.js"></script>
+<!--    <script src="./lumi-mind.js"></script>-->
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!--script async src="https://www.googletagmanager.com/gtag/js?id=G-K1WJVWRCPT"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
@@ -15,112 +18,62 @@
 	</script-->
 
 </head>
-<link rel="stylesheet" href="css/index_style.css">
 
 <body>
 
+    <!--script>
+        console.log("What mode? " + window.treasureMapMode);
+        // var targetPath = './targets_cube.mind';
+        // if (window.treasureMapMode) {
+        //     targetPath = './targets_map.mind';
+        // }
 
-	<div class="welcome_holder">
+        /* insert correct marker file on load */
+        /* if this fails, default is to load the MAP version since that will also work OK on cube */
+        // window.onload = function () {
+        //     document.getElementById('main_scene')
+        //         .setAttribute('mindar', 'maxTrack: 1; imageTargetSrc: ' + targetPath + '; showStats: false; uiLoading: #loading_overlay;');
+        // };
 
-		<div id="welcome">
+    </script-->
 
-				<img class="intro_img" src="assets/CE Illustration_V3-02.png">
-		
+    <a-scene id="main_scene" mindar=" imageTargetSrc: ./targets.mind; showStats: false; uiLoading: #loading_overlay;" color-space="sRGB"
+        renderer="logarithmicDepthBuffer: true;" vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false" gltf-model="./">
+        <a-assets>
+            <!-- shared models -->
+            <a-asset-item id="bibleModel" src="./BookOfAllBooks.gltf"></a-asset-item>
 
-			<div class="intro_text">
+        </a-assets>
 
-				<H2>Strategic Plan – Towards 2028</H2>
+        <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"
+            raycaster="far: 10000; objects: .clickable"></a-camera>
 
-				<P>Welcome to the next iteration of our strategic plan.</P>
-
-				<P>This plan reflects the work we’ve done and the steps we are taking to build a world-class public
-					education system in South Australia.</P>
-
-
-				<P>To find out more, <B>select your mode</B> below then <B>scan each circle</B> with the camera on your
-					mobile device,
-					or visit our <A HREF="https://www.education.sa.gov.au/world-class" target="_blank">website</A>.</P>
-
-
-					
-				<div class="type_selection_parent_inline">
-					<a href="ar.html?type=cube" class="type_selection">
-						<img src="assets/block-colour.png"><BR>
-						Cube
-					</a>
-
-					<a href="ar.html?type=map" class="type_selection">
-						<img src="assets/map-colour.png"><BR>
-						Map</a>
-
-					<a href="" class="type_selection">
-						<img src="assets/download.png"><BR>
-						Download</a>
-				</div>
+        <!--    lights underside-->
+        <a-light type="directional" position="5 -5 1" rotation="90 0 0" target="#directionaltarget" color="#C9C9C9"
+            intensity="0.8">
+            <a-entity id="directionaltarget" position="1.14 -19.2 -10.21"></a-entity>
+        </a-light>
 
 
-				<P>Rick,</P>
+        <!--    lights top-->
+        <a-light type="directional" position="5 -5 1" rotation="90 0 0" target="#directionaltarget0" color="#dfe6fb"
+            intensity="0.9">
+            <a-entity id="directionaltarget0" position="0.42 -0.48 -0.26"></a-entity>
+            <!-- <a-entity id="directionaltarget0" position="0 -0.040 0.02"></a-entity> -->
+        </a-light>
 
-				<P>Chief Executive <BR>
-					Department for Education</P>
-
-
-			</div>
-		</div>
-
-		<div class="type_selection_parent">
-			<a href="ar.html?type=cube" class="type_selection">
-						<img src="assets/block-colour.png"><BR>
-						Cube
-					</a>
-
-					<a href="ar.html?type=map" class="type_selection">
-						<img src="assets/map-colour.png"><BR>
-						Map</a>
-
-					<a href="" class="type_selection">
-						<img src="assets/download.png"><BR>
-						Download</a>
-		</div>
+        <!--    ambient to reduce shadowing-->
+        <a-entity light="type: ambient; color: #f7dbbb; intensity: 1"></a-entity>
 
 
-	</div>
+        <!--    the id is the actual marker number-->
+        <a-entity id="target-1" mindar-image-target="targetIndex: 0" >
+            <a-gltf-model src="#bibleModel" position="0 -0.5 0" rotation="90 0 0" scale="0.2 0.2 0.2" animation-mixer></a-gltf-model>
+        </a-entity>
 
 
-    <div class="footer_container">
-
-        <div class="title_parent">
-            <img src="assets/footer_title.svg">
-        </div>
-
-        <div class="buttons">
-            <span class="button"><a href=""><img src="assets/icon_camera.svg" style="display: none"></a></span>
-            <span class="button"><a href="./index.html"><img src="assets/icon_swap_mode.svg" style="display: none"></a></span>
-            <span class="button"><a href=""><img src="assets/icon_help.svg" style="display: none"></a></span>
-        </div>
-
-        <div class="logo_parent">
-            <a href="http://lumination.com.au/" target="_blank"><img src="assets/lumilogo.png"></a>
-            <a href="https://www.education.sa.gov.au/" target="_blank"><img src="assets/edulogo.png"></a>
-        </div>
-
-    </div>
-
-	<!-- <div class="footer_container" style="justify-content: space-between;">
-
-		<div class="title_parent">
-			<img src="assets/footer_title.svg">
-		</div>
-
-		
-		<div class="logo_parent">
-			<a href="http://lumination.com.au/" target="_blank"><img src="assets/lumilogo.png"></a>
-			<a href="https://www.education.sa.gov.au/" target="_blank"><img src="assets/edulogo.png"></a>
-		</div>
-
-	</div> -->
-
-
+</a-scene>
 </body>
 
 </html>
